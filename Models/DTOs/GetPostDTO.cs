@@ -8,10 +8,12 @@ namespace Models.DTOs
 {
     public class GetPostDTO
     {
-        public string Photo { get; set; }
-        public string Videos { get; set; }
+        public int Id { get; set; }
+        public ICollection<PhotoDTO> Photos { get; set; }
+        public ICollection<VideoDTO> Videos { get; set; }
         public string LikeStatus { get; set; }
-        public string Comments { get; set; }
+        public ICollection<CommentDTO> Comments { get; set; }
+        public string IsMainComment { get; set; }
         public string AppUser { get; set; }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FaceStarr.GlobalErrorHandling;
@@ -20,19 +21,22 @@ namespace FaceStarr.Controllers
         private readonly IMapper _mapper;
         private readonly ICreatePost _createPost;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILikeAPost _likeAPost;
 
         public AccountController(
         IMapper mapper,
         UserManager<AppUser> userManager,
         IApplicationUser applicationUser,
         ICreatePost createPost,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ILikeAPost likeAPost)
         {
             _applicationUser = applicationUser;
             _userManager = userManager;
             _mapper = mapper;
             _createPost = createPost;
             _unitOfWork = unitOfWork;
+            _likeAPost = likeAPost;
         }
 
         [HttpPost("Register")]
@@ -61,18 +65,25 @@ namespace FaceStarr.Controllers
         // [Authorize]
         public async Task <ActionResult<PostDTO>> CreatePost([FromForm]PostDTO post)
         {          
-            var CurrentUser = HttpContext.User.FindFirstValue(ClaimTypes.GivenName);
-            var obj = await _createPost.CreatePost(post,CurrentUser);
+            var currentUser = HttpContext.User.FindFirstValue(ClaimTypes.GivenName);
+            var obj = await _createPost.CreatePost(post,currentUser);
             var mappedObj =  _mapper.Map<Post,PostDTO>(obj);
             return Ok(mappedObj);          
         }
-        [HttpGet]
+  
+        [HttpGet("GlobalPost")]
         public async Task<ActionResult<IEnumerable<Post>>> GetAllPost()
         {
-
             var Data = await _unitOfWork.Repository<Post>().GetAll(null,null,"Photos,Videos,Comments,LikeStatus,AppUser");
             return Ok(_mapper.Map<IEnumerable<Post>,IEnumerable<GetPostDTO>>(Data));
         }
 
+        [HttpPost("LikedPost/{id}")]
+        public async Task<ActionResult<int>> AmountOFLikesOnPost(int id, LikesDTO like)
+        {
+            var currentUser = HttpContext.User.FindFirstValue(ClaimTypes.GivenName);
+            var numOfLikes = await _likeAPost.PostALike(id,like,currentUser);
+            return Ok(numOfLikes);
+        }
     }
 }

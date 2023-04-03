@@ -11,10 +11,11 @@ namespace Models
     {
         [Key]
         public int Id { get; set; }
-        public Photo Photos { get; set; }
-        public Videos Videos { get; set; }
-        public Comment Comments { get; set; }
-        public LikeOrNot LikeStatus { get; set; }
+        public ICollection<Photo> Photos { get; set; }
+        public ICollection<Videos> Videos { get; set; }
+        public ICollection<Comment> Comments { get; set; }
+        public ICollection<LikeOrNot> LikeStatus { get; set; }
+        public string IsMainComment { get; set; }
         public AppUser AppUser { get; set; }
     }
 }

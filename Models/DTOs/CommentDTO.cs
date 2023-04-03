@@ -7,6 +7,7 @@ namespace Models.DTOs
 {
     public class CommentDTO
     {
+        public string IsMainComment { get; set; }
         public string ActualCommentDTO { get; set; }
     }
 }

@@ -20,74 +20,73 @@ namespace Data.Classes
             
         }
         public async Task<Post> CreatePost(PostDTO post, string appUser)
-        {            
+        {           
+            //Get the current user 
             var CurrentUser = await _unitOfWork.Repository<AppUser>().GetFirstOrDefault(x =>x.Email == appUser);
+            //initialize a class that contains a list of post that will belong to the currrent user 
             var nuListOfUserPost = new ListOfUserPost();
-            nuListOfUserPost.Id = Guid.NewGuid().ToString();
+            //Creating an Id for the above list
+            nuListOfUserPost.PostOwner = CurrentUser;
+            //initializing the actual list of post that belongs to the current user
             nuListOfUserPost.CurrentUserPost = new List<Post>();
+            //initializing a post
             var actualNewPost = new Post();
-
+            actualNewPost.Comments = new List<Comment>();
+            actualNewPost.LikeStatus = new List<LikeOrNot>();
                 if(post.file != null)
                 {
+                    actualNewPost.Photos = new List<Photo>();
+                    actualNewPost.Videos = new List<Videos>();
                     foreach(var item in post.file)
-                    {
+                    {               
                         if(item.ContentType == "video/mp4")
                         {
                             var info = await _videoService.SaveVideo(item);
-                            actualNewPost.Videos = new Videos
+                            var nuVid = new Videos
                             {
                                 PostVideos = info
                             };
-                        }                        
-                    }
-                    var pics = await _photoService.AddPhotoAsync(post.file);
-                    actualNewPost.AppUser = CurrentUser;
-                    actualNewPost.Comments = new Comment
-                    {
-                        ActualComment = post.Comments ?? null
-                    };
-                    if(pics == null)
-                    {
-                        actualNewPost.Photos = new Photo()
+                            if(actualNewPost.Videos.Count == 0)
+                                nuVid.IsMain = true;
+                            actualNewPost.Videos.Add(nuVid);
+                        } 
+                        if(item.ContentType != "video/mp4")
                         {
-                            ApperUserPics = null,
-                            PhotoUrl =  null,
-                            PublicId = null,
-                        };
-                    }
-                    else
-                    {
-                        actualNewPost.Photos = new Photo
+                            var pics = await _photoService.AddPhotoAsync(item);
+                            var nuPics = new Photo()
+                            {
+                                ApperUserPics = CurrentUser,
+                                PhotoUrl = pics.SecureUrl.AbsoluteUri ?? null,
+                                PublicId = pics.PublicId ?? null,
+                            };
+                             if(actualNewPost.Photos.Count == 0)
+                                nuPics.IsMain = true;
+                            actualNewPost.Photos.Add(nuPics);
+                        }   
+                        actualNewPost.AppUser = CurrentUser;
+                        actualNewPost.IsMainComment = post.Comments;     
+                        var nuLike = new LikeOrNot
                         {
-                            ApperUserPics = CurrentUser,
-                            PhotoUrl = pics.SecureUrl.AbsoluteUri,
-                            PublicId = pics.PublicId,
+                            LikeStatus = "New Post"
                         };
-                    }         
-                    actualNewPost.LikeStatus = new LikeOrNot
-                    {
-                        LikeStatus = "New"
-                    }; 
-                    nuListOfUserPost.CurrentUserPost.Add(actualNewPost);
+                        actualNewPost.LikeStatus.Add(nuLike);                   
+                    }
+                    nuListOfUserPost.CurrentUserPost.Add(actualNewPost);  
                     _unitOfWork.Repository<ListOfUserPost>().Add(nuListOfUserPost);
-                    await _unitOfWork.Complete();
-                    return actualNewPost;
+                    await _unitOfWork.Complete(); 
+                    return actualNewPost; 
                 }
-                actualNewPost.AppUser = CurrentUser;
-                actualNewPost.Comments = new Comment
-                {
-                    ActualComment = post.Comments
-                };
-                actualNewPost.Photos = new Photo();
-                actualNewPost.Videos = new Videos();
-                actualNewPost.LikeStatus = new LikeOrNot
-                {
-                    LikeStatus = "New"
-                };
-                nuListOfUserPost.CurrentUserPost.Add(actualNewPost);
-                _unitOfWork.Repository<ListOfUserPost>().Add(nuListOfUserPost);
-                await _unitOfWork.Complete();
-                return actualNewPost;
+            actualNewPost.AppUser = CurrentUser;
+            actualNewPost.IsMainComment = post.Comments;  
+            var onlyNuLike = new LikeOrNot
+            {
+                LikeStatus = "New Post"
+            };
+            actualNewPost.LikeStatus.Add(onlyNuLike);
+            nuListOfUserPost.CurrentUserPost.Add(actualNewPost);
+            _unitOfWork.Repository<ListOfUserPost>().Add(nuListOfUserPost);
+            await _unitOfWork.Complete();
+            return actualNewPost;
         }
     }
 }

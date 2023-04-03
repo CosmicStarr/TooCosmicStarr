@@ -8,6 +8,8 @@ namespace Models
     public class Videos
     {
         public int Id { get; set; }
-        public Byte[] PostVideos { get; set; }
+        public bool IsMain { get; set; }
+        public string PostVideos { get; set; }
+        public AppUser AppUserVideos { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using Data.Utility;
 using FaceStarr.AutoMapper;
 using FaceStarr.GlobalErrorHandling;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +15,8 @@ builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IPhotoService,PhotoService>();
 builder.Services.AddScoped<IVideoService,VideoService>();
 builder.Services.AddScoped<ICreatePost,NewPost>();
+builder.Services.AddScoped<ILikeAPost,LikeAPost>();
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("JWT"));
 builder.Services.Configure<CloudinaryPhotoInfo>(builder.Configuration.GetSection("CloudinaryPhotos"));
 builder.Services.AddScoped<IApplicationUser,ApplicationUser>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
@@ -48,7 +51,8 @@ builder.Services.AddAuthentication(options =>
                     ValidIssuer = builder.Configuration["JWT:VaildIssuer"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
                 };
-            });          
+            });   
+builder.Services.AddHttpContextAccessor();       
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
             {
@@ -88,7 +92,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles();
 app.UseCors("FaceStarrUI");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

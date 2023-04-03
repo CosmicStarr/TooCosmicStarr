@@ -11,5 +11,6 @@ namespace Models
         [Key]
         public int Id { get; set; }
         public string ActualComment { get; set; }
+        public AppUser AppUserComments { get; set; }
     }
 }

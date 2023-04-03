@@ -8,7 +8,10 @@ namespace Models
 {
     public class ListOfUserPost
     {
-        public string Id { get; set; }
+        [Key]
+        public int Id { get; set; }
         public ICollection<Post> CurrentUserPost { get; set; }
+        public AppUser PostOwner { get; set; }
+        
     }
 }

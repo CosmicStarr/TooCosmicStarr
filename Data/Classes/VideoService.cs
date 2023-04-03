@@ -3,24 +3,59 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Data.Classes
 {
     public class VideoService : IVideoService
     {
-
-        public async Task<byte[]> SaveVideo(IFormFile video)
+        private readonly IWebHostEnvironment _web;
+        private readonly ILogger<VideoService> _logger;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly string folder = "videos";
+        public VideoService(IWebHostEnvironment web,IHttpContextAccessor httpContext,ILogger<VideoService> logger)
         {
-            using (var file = video.OpenReadStream())
+            _httpContext = httpContext;
+            _web = web;
+            _logger = logger;
+        }
+
+        public async Task<string> SaveVideo(IFormFile video)
+        {
+            try
             {
-                using var msStream = new MemoryStream();
-                
-                    await file.CopyToAsync(msStream);
-                    var buffer = new byte[msStream.Length];
-                    return msStream.ToArray();
+                //the absolute path to wwwroot
+                var webRootPath = _web.WebRootPath;
+                //randomizing the file name by creating a guid
+                var fileName = Guid.NewGuid().ToString();
+                //the path to upload video file coming from angular
+                var uploads = Path.Combine(webRootPath,folder);
+                //retrieving the extension from the video file
+                var extension = Path.GetExtension(video.FileName);
+                //opening a filestream to create a videofile to store the uploaded videos 
+                if(!Directory.Exists(uploads)) Directory.CreateDirectory(uploads);
+                using (var fileStream = new FileStream(Path.Combine(uploads,fileName + extension),FileMode.Create))
+                {   
+                    // using var memoryStream = new MemoryStream();
+                    // await video.CopyToAsync(memoryStream);
+                    // var vidInfo = memoryStream.ToArray();
+                    // await File.WriteAllBytesAsync(fileStream.ToString(),vidInfo);
+                    //copying the uploaded video file to the filestream! 
+                    await video.CopyToAsync(fileStream);
+                }
+                // var filePath = @"\videos\" + fileName + extension;
+                //Creating an http://localhost.../
+                var url = $"{_httpContext.HttpContext.Request.Scheme}://{_httpContext.HttpContext.Request.Host}";
+                return Path.Combine(url,folder,fileName+extension).Replace("\\","/");
+                //Create some logic to update a video 
             }
- 
+            catch (Exception ex)
+            {            
+                _logger.LogError(ex, ex.Message);
+            }
+            return null;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Data.Interfaces
 {
     public interface IPhotoService
     {
-        Task<ImageUploadResult> AddPhotoAsync(ICollection<IFormFile> file);
+        Task<ImageUploadResult> AddPhotoAsync(IFormFile file);
         Task<DeletionResult> DeletePhotoAsync(string PublicId);
     }
 }

@@ -6,16 +6,16 @@ namespace FaceStarr.AutoMapper
     {
         public AutoMapperProfiles()
         {
-            CreateMap<Post,GetPostDTO>().ForPath(x=>x.Photo,o=>o.MapFrom(s=>s.Photos.PhotoUrl))
-                                        .ForPath(x=>x.Comments,o=>o.MapFrom(s=>s.Comments.ActualComment))
-                                        .ForPath(x=>x.LikeStatus,o=>o.MapFrom(s=>s.LikeStatus.LikeStatus))
-                                        .ForPath(x=>x.Videos,o=>o.MapFrom(s=>s.Videos.PostVideos))
+            CreateMap<Post,GetPostDTO>().ForPath(x=>x.Photos,o=>o.MapFrom(s=>s.Photos))
+                                        .ForPath(x=>x.IsMainComment,o=>o.MapFrom(s=>s.IsMainComment))
+                                        .ForPath(x=>x.Videos,o=>o.MapFrom(s=>s.Videos))
                                         .ForPath(x=>x.AppUser,o=>o.MapFrom(s=>s.AppUser.Email));
+            CreateMap<Videos,VideoDTO>().ForPath(x=>x.AppUserVideos,o=>o.MapFrom(s=>s.AppUserVideos));                                                                                         
             CreateMap<Post,PostDTO>().ReverseMap()
-                                     .ForPath(x=>x.Photos.file,o=>o.Ignore())
-                                     .ForPath(x=>x.Comments.ActualComment,o=>o.MapFrom(s=>s.Comments));
+                                     .ForPath(x=>x.Photos,o=>o.Ignore())
+                                     .ForPath(x=>x.Comments,o=>o.MapFrom(s=>s.Comments));
             CreateMap<Post,PostDTO>().ForPath(x=>x.file,o=>o.Ignore())
-                                     .ForPath(x=>x.Comments,o=>o.MapFrom(s=>s.Comments.ActualComment));
+                                     .ForPath(x=>x.Comments,o=>o.MapFrom(s=>s.Comments));
             CreateMap<Photo,PhotoDTO>().ReverseMap().ForPath(x=>x.file,o=>o.Ignore());
             CreateMap<Photo,PhotoDTO>();
             CreateMap<LikeOrNot,LikeStatusDTO>().ForMember(x =>x.LikeStatus,o=>o.MapFrom(x=>x.LikeStatus));

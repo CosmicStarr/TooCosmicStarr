@@ -21,7 +21,6 @@ namespace Data
         public DbSet<AppUserNetwork> GetAppUserNetwork { get; set; }
         public DbSet<Photo> GetPhotos { get; set; }
         public DbSet<Videos> GetVideos { get; set; }
-        public DbSet<PostUserLikes> GetPostUserLikes { get; set; }
         public DbSet<Comment> GetComments { get; set; }
     }
 }

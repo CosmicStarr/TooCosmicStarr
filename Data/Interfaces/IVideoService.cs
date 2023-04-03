@@ -8,6 +8,6 @@ namespace Data.Interfaces
 {
     public interface IVideoService
     {
-        Task<byte[]> SaveVideo(IFormFile video);
+        Task<string> SaveVideo(IFormFile video);
     }
 }

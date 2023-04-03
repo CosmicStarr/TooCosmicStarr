@@ -13,7 +13,6 @@ namespace Models
         public string LastName { get; set; }
         [NotMapped]
         public string FullName { get {return FirstName + " " + LastName;}}
-        public ListOfUserPost AppUserPost { get; set; }
         public AppUserNetwork NetworkOfFriends { get; set; }
     }
 }

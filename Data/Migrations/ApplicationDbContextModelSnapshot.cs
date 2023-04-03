@@ -163,9 +163,6 @@ namespace Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("AppUserPostId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -221,8 +218,6 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserPostId");
-
                     b.HasIndex("NetworkOfFriendsId");
 
                     b.HasIndex("NormalizedEmail")
@@ -260,7 +255,17 @@ namespace Data.Migrations
                     b.Property<string>("ActualComment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AppUserCommentsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserCommentsId");
+
+                    b.HasIndex("PostId");
 
                     b.ToTable("GetComments");
                 });
@@ -273,20 +278,41 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AppUserLikesId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("LikeStatus")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Likes")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserLikesId");
+
+                    b.HasIndex("PostId");
 
                     b.ToTable("LikeOrNot");
                 });
 
             modelBuilder.Entity("Models.ListOfUserPost", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PostOwnerId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PostOwnerId");
 
                     b.ToTable("GetListOfUserPosts");
                 });
@@ -308,12 +334,17 @@ namespace Data.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PublicId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApperUserPicsId");
+
+                    b.HasIndex("PostId");
 
                     b.ToTable("Pictures");
                 });
@@ -329,51 +360,19 @@ namespace Data.Migrations
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("CommentsId")
-                        .HasColumnType("int");
+                    b.Property<string>("IsMainComment")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LikeStatusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ListOfUserPostId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("PhotosId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PostUserLikesId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("VideosId")
+                    b.Property<int?>("ListOfUserPostId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
-                    b.HasIndex("CommentsId");
-
-                    b.HasIndex("LikeStatusId");
-
                     b.HasIndex("ListOfUserPostId");
 
-                    b.HasIndex("PhotosId");
-
-                    b.HasIndex("PostUserLikesId");
-
-                    b.HasIndex("VideosId");
-
                     b.ToTable("GetPosts");
-                });
-
-            modelBuilder.Entity("Models.PostUserLikes", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GetPostUserLikes");
                 });
 
             modelBuilder.Entity("Models.Videos", b =>
@@ -384,10 +383,23 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("PostVideos")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("AppUserVideosId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PostVideos")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserVideosId");
+
+                    b.HasIndex("PostId");
 
                     b.ToTable("GetVideos");
                 });
@@ -445,17 +457,46 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Models.AppUser", b =>
                 {
-                    b.HasOne("Models.ListOfUserPost", "AppUserPost")
-                        .WithMany()
-                        .HasForeignKey("AppUserPostId");
-
                     b.HasOne("Models.AppUserNetwork", "NetworkOfFriends")
                         .WithMany("Friends")
                         .HasForeignKey("NetworkOfFriendsId");
 
-                    b.Navigation("AppUserPost");
-
                     b.Navigation("NetworkOfFriends");
+                });
+
+            modelBuilder.Entity("Models.Comment", b =>
+                {
+                    b.HasOne("Models.AppUser", "AppUserComments")
+                        .WithMany()
+                        .HasForeignKey("AppUserCommentsId");
+
+                    b.HasOne("Models.Post", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId");
+
+                    b.Navigation("AppUserComments");
+                });
+
+            modelBuilder.Entity("Models.LikeOrNot", b =>
+                {
+                    b.HasOne("Models.AppUser", "AppUserLikes")
+                        .WithMany()
+                        .HasForeignKey("AppUserLikesId");
+
+                    b.HasOne("Models.Post", null)
+                        .WithMany("LikeStatus")
+                        .HasForeignKey("PostId");
+
+                    b.Navigation("AppUserLikes");
+                });
+
+            modelBuilder.Entity("Models.ListOfUserPost", b =>
+                {
+                    b.HasOne("Models.AppUser", "PostOwner")
+                        .WithMany()
+                        .HasForeignKey("PostOwnerId");
+
+                    b.Navigation("PostOwner");
                 });
 
             modelBuilder.Entity("Models.Photo", b =>
@@ -463,6 +504,10 @@ namespace Data.Migrations
                     b.HasOne("Models.AppUser", "ApperUserPics")
                         .WithMany()
                         .HasForeignKey("ApperUserPicsId");
+
+                    b.HasOne("Models.Post", null)
+                        .WithMany("Photos")
+                        .HasForeignKey("PostId");
 
                     b.Navigation("ApperUserPics");
                 });
@@ -473,39 +518,24 @@ namespace Data.Migrations
                         .WithMany()
                         .HasForeignKey("AppUserId");
 
-                    b.HasOne("Models.Comment", "Comments")
-                        .WithMany()
-                        .HasForeignKey("CommentsId");
-
-                    b.HasOne("Models.LikeOrNot", "LikeStatus")
-                        .WithMany()
-                        .HasForeignKey("LikeStatusId");
-
                     b.HasOne("Models.ListOfUserPost", null)
                         .WithMany("CurrentUserPost")
                         .HasForeignKey("ListOfUserPostId");
 
-                    b.HasOne("Models.Photo", "Photos")
-                        .WithMany()
-                        .HasForeignKey("PhotosId");
-
-                    b.HasOne("Models.PostUserLikes", null)
-                        .WithMany("UsersLikedPost")
-                        .HasForeignKey("PostUserLikesId");
-
-                    b.HasOne("Models.Videos", "Videos")
-                        .WithMany()
-                        .HasForeignKey("VideosId");
-
                     b.Navigation("AppUser");
+                });
 
-                    b.Navigation("Comments");
+            modelBuilder.Entity("Models.Videos", b =>
+                {
+                    b.HasOne("Models.AppUser", "AppUserVideos")
+                        .WithMany()
+                        .HasForeignKey("AppUserVideosId");
 
-                    b.Navigation("LikeStatus");
+                    b.HasOne("Models.Post", null)
+                        .WithMany("Videos")
+                        .HasForeignKey("PostId");
 
-                    b.Navigation("Photos");
-
-                    b.Navigation("Videos");
+                    b.Navigation("AppUserVideos");
                 });
 
             modelBuilder.Entity("Models.AppUserNetwork", b =>
@@ -518,9 +548,15 @@ namespace Data.Migrations
                     b.Navigation("CurrentUserPost");
                 });
 
-            modelBuilder.Entity("Models.PostUserLikes", b =>
+            modelBuilder.Entity("Models.Post", b =>
                 {
-                    b.Navigation("UsersLikedPost");
+                    b.Navigation("Comments");
+
+                    b.Navigation("LikeStatus");
+
+                    b.Navigation("Photos");
+
+                    b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
         }

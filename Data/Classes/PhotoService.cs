@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
@@ -23,27 +19,17 @@ namespace Data.Classes
             _cloud = new Cloudinary(CloudAccount);
         }
 
-        public async Task<ImageUploadResult> AddPhotoAsync(ICollection<IFormFile> file)
+        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
         {
-            foreach(var item in file)
+            var UploadedImage = new ImageUploadResult();
+            using var stream = file.OpenReadStream();
+            var UploadParams = new ImageUploadParams
             {
-                if(item.ContentType != "video/mp4")
-                {
-                    var UploadedImage = new ImageUploadResult();
-                    if(item.Length > 0)
-                    {
-                        using var stream = item.OpenReadStream();
-                        var UploadParams = new ImageUploadParams
-                        {
-                            File = new FileDescription(item.FileName,stream),
-                            Transformation = new Transformation().Height(612).Width(612).Crop("fill").Gravity("face")
-                        };
-                        UploadedImage = await _cloud.UploadAsync(UploadParams);
-                    }
-                    return UploadedImage;
-                }
-            }
-            return null;
+                File = new FileDescription(file.FileName,stream),
+                Transformation = new Transformation().Height(700).Width(600)
+            };
+            UploadedImage = await _cloud.UploadAsync(UploadParams);       
+            return UploadedImage;
         }
 
         public async Task<DeletionResult> DeletePhotoAsync(string PublicId)
