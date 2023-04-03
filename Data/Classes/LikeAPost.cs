@@ -13,8 +13,6 @@ namespace Data.Classes
             var CurrentUser = await _unitOfWork.Repository<AppUser>().GetFirstOrDefault(x=>x.Email == currentUser);
             //Get the post the Current User Liked
             var Data = await _unitOfWork.Repository<Post>().GetFirstOrDefault(x=>x.Id == id,"Photos,Videos,Comments,LikeStatus,AppUser");
-            //Initialize the List of likes that belongs to the Post the Current User liked
-            Data.LikeStatus = new List<LikeOrNot>();
             //Create a new Like object
             var nuLike = new LikeOrNot
             {

@@ -14,6 +14,7 @@ namespace Models.DTOs
         public string LikeStatus { get; set; }
         public ICollection<CommentDTO> Comments { get; set; }
         public string IsMainComment { get; set; }
+        public int LikeCount { get; set; }
         public string AppUser { get; set; }
     }
 }
