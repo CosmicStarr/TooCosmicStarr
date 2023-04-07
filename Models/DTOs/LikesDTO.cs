@@ -9,5 +9,6 @@ namespace Models.DTOs
     {
         public bool Like { get; set; }
         public string LikeStatusDTO { get; set; }
+        public string AppUserLikes { get; set; }
     }
 }

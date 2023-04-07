@@ -15,7 +15,6 @@ namespace Models
         public ICollection<Videos> Videos { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<LikeOrNot> LikeStatus { get; set; }
-        public int LikeCount { get; set; }
         public string IsMainComment { get; set; }
         public AppUser AppUser { get; set; }
     }

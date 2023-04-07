@@ -7,6 +7,6 @@ namespace Data.Interfaces
 {
     public interface ILikeAPost
     {
-        Task<int> PostALike(int id,LikesDTO like,string postOwer);
+        Task<Post> PostALike(int id,LikesDTO like,string postOwer);
     }
 }

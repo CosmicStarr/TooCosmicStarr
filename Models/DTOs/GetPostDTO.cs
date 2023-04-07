@@ -11,10 +11,9 @@ namespace Models.DTOs
         public int Id { get; set; }
         public ICollection<PhotoDTO> Photos { get; set; }
         public ICollection<VideoDTO> Videos { get; set; }
-        public string LikeStatus { get; set; }
+        public ICollection<LikesDTO> LikeStatus{ get; set; }
         public ICollection<CommentDTO> Comments { get; set; }
         public string IsMainComment { get; set; }
-        public int LikeCount { get; set; }
         public string AppUser { get; set; }
     }
 }

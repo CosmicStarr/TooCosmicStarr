@@ -79,11 +79,14 @@ namespace FaceStarr.Controllers
         }
 
         [HttpPost("LikedPost/{id}")]
-        public async Task<ActionResult<int>> AmountOFLikesOnPost(int id, LikesDTO like)
+        public async Task<ActionResult<Post>> AmountOFLikesOnPost(int id, LikesDTO like)
         {
             var currentUser = HttpContext.User.FindFirstValue(ClaimTypes.GivenName);
             var numOfLikes = await _likeAPost.PostALike(id,like,currentUser);
-            return Ok(numOfLikes);
+            if(numOfLikes == null)
+                return NoContent();
+            return Ok(_mapper.Map<Post,GetPostDTO>(numOfLikes));
         }
+
     }
 }
